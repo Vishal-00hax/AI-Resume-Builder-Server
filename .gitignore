@@ -1,0 +1,92 @@
+# ==========================================
+# 1. SECRETS, TOKENS & CERTIFICATES (⚠️ CRITICAL)
+# ==========================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+credentials/
+tokens/
+.secret
+*.secret
+
+# ==========================================
+# 2. NODE.JS DEPENDENCIES
+# ==========================================
+node_modules/
+.pnpm-store/
+
+# ==========================================
+# 3. MONGO DB LOCAL FILES (🚨 DO NOT PUSH DB DUMPS)
+# ==========================================
+dump/
+mongodump/
+*.bson
+*.mongodb
+data/
+db-data/
+mongodb-data/
+/data/db                # Default MongoDB local storage path
+/data/db/
+
+# ==========================================
+# 4. BUILD / COMPILED OUTPUT (TypeScript/Transpilers)
+# ==========================================
+dist/
+build/
+out/
+*.tsbuildinfo
+lib/                    # If you compile to /lib
+
+# ==========================================
+# 5. LOGS & RUNTIME FILES
+# ==========================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pm2-*.log
+*.pid
+*.seed
+*.pid.lock
+
+# ==========================================
+# 6. TEST COVERAGE REPORTS
+# ==========================================
+coverage/
+.nyc_output/
+.jestcache
+.cache/
+
+# ==========================================
+# 7. OPERATING SYSTEM & IDE FILES
+# ==========================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+*~
+.env.local
+
+# ==========================================
+# 8. MISCELLANEOUS TEMPORARY FILES
+# ==========================================
+*.tmp
+*.temp
+.tarball
+.tarn
+tmp/
+temp/
