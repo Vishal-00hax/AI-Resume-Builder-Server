@@ -169,7 +169,7 @@ const ResumeSchema = new mongoose.Schema(
     },
     public: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     template: {
       type: String,
@@ -201,7 +201,7 @@ const ResumeSchema = new mongoose.Schema(
     },
     personal_info: {
       type: PersonalInfoSchema,
-      required: true,
+      required: false,
     },
     experience: {
       type: [ExperienceSchema],

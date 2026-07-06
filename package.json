@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@imagekit/nodejs": "^7.9.1",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -22,5 +23,9 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
+  },
+  "imports": {
+    "#middleware/*": "./middleware/*",
+    "#controllers/*": "./controllers/*"
   }
 }
