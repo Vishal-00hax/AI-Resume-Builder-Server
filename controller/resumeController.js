@@ -3,6 +3,19 @@ import mongoose from "mongoose";
 import imagekit from "../config/imagekit.js";
 import fs from "fs";
 
+// Helper to prevent data-wiping in MongoDB
+const toDotNotation = (obj, prefix = "") => {
+  return Object.entries(obj).reduce((acc, [key, val]) => {
+    const path = prefix ? `${prefix}.${key}` : key;
+    if (val && typeof val === "object" && !Array.isArray(val)) {
+      Object.assign(acc, toDotNotation(val, path));
+    } else {
+      acc[path] = val;
+    }
+    return acc;
+  }, {});
+};
+
 // api/resume/create
 export const createResume = async (req, res) => {
   try {
@@ -21,15 +34,12 @@ export const createResume = async (req, res) => {
     } = req.body;
 
     if (!title) {
-      return res.status(400).json({
-        error: "Title is required",
-      });
+      return res.status(400).json({ error: "Title is required" });
     }
 
     const newResume = await Resume.create({
       userId,
       title,
-      // Optional fields (only include if provided)
       ...(personal_info && { personal_info }),
       ...(template && { template }),
       ...(accent_color && { accent_color }),
@@ -51,22 +61,17 @@ export const createResume = async (req, res) => {
 };
 
 // Delete Resume /api/resume/delete/:resumeId
-
 export const deleteResume = async (req, res) => {
   try {
     const userId = req.user._id;
     const { resumeId } = req.params;
 
     if (!resumeId) {
-      return res.status(400).json({
-        error: "Resume Id is required",
-      });
+      return res.status(400).json({ error: "Resume Id is required" });
     }
 
     if (!mongoose.Types.ObjectId.isValid(resumeId)) {
-      return res.status(400).json({
-        error: "Invalid Resume ID format",
-      });
+      return res.status(400).json({ error: "Invalid Resume ID format" });
     }
 
     const deletedResume = await Resume.findOneAndDelete({
@@ -94,22 +99,17 @@ export const deleteResume = async (req, res) => {
 };
 
 // Get resume by id /api/resume/get/:resumeId
-
 export const getResumeById = async (req, res) => {
   try {
     const userId = req.user._id;
     const { resumeId } = req.params;
 
     if (!resumeId) {
-      return res.status(400).json({
-        error: "Resume Id is required",
-      });
+      return res.status(400).json({ error: "Resume Id is required" });
     }
 
     if (!mongoose.Types.ObjectId.isValid(resumeId)) {
-      return res.status(400).json({
-        error: "Invalid Resume ID format",
-      });
+      return res.status(400).json({ error: "Invalid Resume ID format" });
     }
 
     const resume = await Resume.findOne({
@@ -123,10 +123,7 @@ export const getResumeById = async (req, res) => {
       });
     }
 
-    res.status(200).json({
-      success: true,
-      resume: resume,
-    });
+    res.status(200).json({ success: true, resume: resume });
   } catch (err) {
     if (err.name === "CastError") {
       return res.status(400).json({ error: "Invalid Resume ID format" });
@@ -137,13 +134,23 @@ export const getResumeById = async (req, res) => {
 };
 
 // Get Resume by public: true,  /api/resume/public/:resumeId
-
 export const getPublicResume = async (req, res) => {
   try {
     const { resumeId } = req.params;
-    const resume = await Resume.find({ public: true, _id: resumeId }).select(
+
+    if (!mongoose.Types.ObjectId.isValid(resumeId)) {
+      return res.status(400).json({ error: "Invalid Resume ID format" });
+    }
+
+    // FIXED: Changed .find() to .findOne() so frontend gets an Object, not an Array!
+    const resume = await Resume.findOne({ public: true, _id: resumeId }).select(
       "-__v -createdAt -updatedAt",
     );
+
+    if (!resume) {
+      return res.status(404).json({ error: "Public resume not found" });
+    }
+
     res.status(200).json({ success: true, resume: resume });
   } catch (err) {
     console.error("Get Resume by public Error:", err);
@@ -158,31 +165,24 @@ export const updateResume = async (req, res) => {
     const { resumeId, resumeData, removeBackground } = req.body;
     const image = req.file;
 
-    // 1. Validate Resume ID
     if (!resumeId || !mongoose.Types.ObjectId.isValid(resumeId)) {
       return res.status(400).json({ error: "Valid Resume ID is required" });
     }
 
-    // 2. Parse resumeData safely
-    let copyResumeData;
-    try {
-      copyResumeData =
-        typeof resumeData === "string" ? JSON.parse(resumeData) : resumeData;
-    } catch (parseError) {
-      return res
-        .status(400)
-        .json({ error: "Invalid JSON format in resumeData" });
+    let parsedData = {};
+    if (resumeData) {
+      try {
+        parsedData =
+          typeof resumeData === "string" ? JSON.parse(resumeData) : resumeData;
+      } catch (parseError) {
+        return res
+          .status(400)
+          .json({ error: "Invalid JSON format in resumeData" });
+      }
     }
 
-    if (!copyResumeData || typeof copyResumeData !== "object") {
-      return res
-        .status(400)
-        .json({ error: "Resume data is required and must be an object" });
-    }
-
-    // 3. Handle Image Upload to ImageKit
     if (image) {
-      // Convert RAM buffer to Base64 string for 100% reliable network transmission
+      // Using diskStorage, image.buffer is undefined. It correctly falls back to createReadStream.
       const filePayload = image.buffer
         ? image.buffer.toString("base64")
         : fs.createReadStream(image.path);
@@ -190,25 +190,21 @@ export const updateResume = async (req, res) => {
       const response = await imagekit.files.upload({
         file: filePayload,
         fileName: `resume-${userId}-${Date.now()}.png`,
-        folder: "user-resume",
+        // IMPROVEMENT: Dynamically organize ImageKit folders by User ID!
+        folder: `user-resumes/${userId}`,
         transformation: {
-          pre: `w-300,h-300,fo-face,z-0.75${removeBackground === "true" || removeBackground === true ? ",e-bgremove" : ""}`,
+          pre: `w-300,h-300,fo-face,z-0.75${
+            removeBackground === "true" || removeBackground === true
+              ? ",e-bgremove"
+              : ""
+          }`,
         },
       });
 
-      console.log("ImageKit Upload URL:", response.url);
+      // Safely attach to parsed data using dot notation
+      parsedData["personal_info.image"] = response.url;
 
-      // FIXED: Safely attach image URL without overwriting existing personal_info data in MongoDB
-      if (
-        copyResumeData.personal_info &&
-        typeof copyResumeData.personal_info === "object"
-      ) {
-        copyResumeData.personal_info.image = response.url;
-      } else {
-        copyResumeData["personal_info.image"] = response.url;
-      }
-
-      // Only unlink if disk storage was accidentally used (fallback cleanup)
+      // Clean up the temp disk file
       if (image.path) {
         fs.unlink(image.path, (err) => {
           if (err) console.error("Failed to delete temp file:", err);
@@ -216,10 +212,18 @@ export const updateResume = async (req, res) => {
       }
     }
 
-    // 4. Update MongoDB using $set to guarantee clean partial updates
+    // Convert everything to dot-notation so ONLY provided fields update!
+    const safeUpdatePayload = toDotNotation(parsedData);
+
+    if (Object.keys(safeUpdatePayload).length === 0) {
+      return res
+        .status(400)
+        .json({ error: "No valid fields provided for update" });
+    }
+
     const resume = await Resume.findOneAndUpdate(
       { userId, _id: resumeId },
-      { $set: copyResumeData },
+      { $set: safeUpdatePayload },
       { returnDocument: "after", runValidators: true },
     );
 
