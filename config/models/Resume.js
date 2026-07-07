@@ -33,13 +33,13 @@ const PersonalInfoSchema = new mongoose.Schema({
   phone: {
     type: String,
     maxlength: 13,
-    dafault: "",
+    default: "",
   },
   location: {
     type: String,
-    deafult: "",
+    default: "",
     trim: true,
-    maxlenght: 100,
+    maxlength: 100,
   },
   linkedin: {
     type: String,

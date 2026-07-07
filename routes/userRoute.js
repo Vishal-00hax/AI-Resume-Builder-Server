@@ -5,7 +5,7 @@ import {
   getUserById,
   getUserResume,
 } from "../controller/userController.js";
-import userAuth from "../middelware/authMiddelware.js";
+import userAuth from "../middelware/authMiddleware.js";
 
 const userRouter = express.Router();
 
