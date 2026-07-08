@@ -32,7 +32,7 @@ const PersonalInfoSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    maxlength: 13,
+    maxlength: 20,
     default: "",
   },
   location: {
@@ -44,10 +44,6 @@ const PersonalInfoSchema = new mongoose.Schema({
   linkedin: {
     type: String,
     trim: true,
-    validate: {
-      validator: (v) => !v || /^https?:\/\/(www\.)?linkedin\.com\/.+/.test(v),
-      message: "LinkedIn must be a valid LinkedIn URL",
-    },
   },
   website: {
     type: String,
@@ -144,7 +140,6 @@ const EducationSchema = new mongoose.Schema({
   gpa: {
     type: String,
     default: "",
-    maxlength: 4,
   },
   description: {
     type: String,
