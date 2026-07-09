@@ -68,11 +68,12 @@ export const getUserById = async (req, res) => {
     const userId = req.user._id;
 
     // check if the user is already present
-    const user = await User.findById(userId).select("-password");
+    const user = await User.findById(userId).select(
+      "-password -createdAt -updatedAt -__v",
+    );
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    user.password = undefined;
 
     res.status(200).json({ data: user });
   } catch (err) {

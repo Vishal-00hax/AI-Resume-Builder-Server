@@ -201,7 +201,11 @@ export const uploadResume = async (req, res) => {
         error: "AI के रिस्पॉन्स से रेज़्यूमे डेटा पार्स करने में विफल रहा।",
       });
     }
-    const newResume = await Resume.create({ userId, title, ...parsedData });
+    const newResume = await Resume.create({
+      userId: userId,
+      title: title,
+      ...parsedData,
+    });
     res.status(200).json({ resume: newResume._id });
   } catch (err) {
     res.status(500).json({ error: err.message });
