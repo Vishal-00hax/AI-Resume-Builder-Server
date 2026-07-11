@@ -12,7 +12,7 @@ import {
 const resumeRouter = express.Router();
 
 resumeRouter.post("/create", userAuth, createResume);
-resumeRouter.put("/update", userAuth, upload.single("image"), updateResume);
+resumeRouter.patch("/update", userAuth, upload.single("image"), updateResume);
 resumeRouter.delete("/delete/:resumeId", userAuth, deleteResume);
 resumeRouter.get("/get/:resumeId", userAuth, getResumeById);
 resumeRouter.get("/public/:resumeId", userAuth, getPublicResume);

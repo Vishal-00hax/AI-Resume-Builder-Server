@@ -53,8 +53,7 @@ export const enhanceProfessionalSummary = async (req, res) => {
 
     // Generic fallback for network errors or unhandled exceptions
     return res.status(500).json({
-      success: false,
-      error: "Internal Server Error. Please try again later.",
+      message: "Internal Server Error. Please try again later.",
     });
   }
 };
@@ -71,7 +70,7 @@ export const enhanceJobDiscription = async (req, res) => {
         .json({ message: "Input field is required and cannot be empty." });
     }
     const response = await ai.chat.completions.create({
-      model: process.env.OPEN_AI_MODEL || "llama-3.3-70b-versatile",
+      model: process.env.OPEN_AI_MODEL,
       messages: [
         {
           role: "system",
@@ -89,7 +88,7 @@ export const enhanceJobDiscription = async (req, res) => {
     const enhanceResponse = response.choices[0].message.content.trim();
     res.status(200).json({ data: enhanceResponse });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
     console.error("Professional Summary Enhance Error: ", err.message);
   }
 };
@@ -107,7 +106,7 @@ export const uploadResume = async (req, res) => {
         .json({ message: "Input field is required and cannot be empty." });
     }
     const response = await ai.chat.completions.create({
-      model: process.env.OPEN_AI_MODEL || "llama-3.3-70b-versatile",
+      model: process.env.OPEN_AI_MODEL,
       messages: [
         {
           role: "system",
@@ -118,72 +117,47 @@ export const uploadResume = async (req, res) => {
           content: `extract data from this resume: ${resumeText} 
           Provide data in the following JSON format with no additional text befor or after: 
           {
-          "professional_summary": "",
-
-  "skills": [],
-
+  "professional_summary": "", // String (Maximum 200 characters)
+  "skills": [], // Array of Strings
   "personal_info": {
-    "image": "",
-
-    "full_name": "",
-
-    "profession": "",
-
-    "email": "",
-
-    "phone": "",
-
-    "location": "",
-
-    "linkedin": "",
-
-    "website": ""
+    "image": "", // String (Valid URL or leave empty)
+    "full_name": "", // String (Maximum 40 characters)
+    "profession": "", // String (Maximum 100 characters)
+    "email": "", // String (Must be a valid email format)
+    "phone": "", // String (Maximum 20 characters)
+    "location": "", // String (Maximum 100 characters)
+    "linkedin": "", // String
+    "website": "" // String (Valid URL or leave empty)
   },
-
   "experience": [
     {
-      "company": "",
-
-      "position": "",
-
-      "start_date": "",
-
-      "end_date": "",
-
-      "is_current": false,
-
-      "description": ""
+      "company": "", // String (Maximum 100 characters)
+      "position": "", // String (Maximum 100 characters)
+      "start_date": "", // String (Maximum 10 characters, e.g., "YYYY-MM", "YYYY")
+      "end_date": "", // String (Maximum 10 characters, e.g., "YYYY-MM", or empty if current)
+      "is_current": false, // Boolean (true if currently working here)
+      "description": "" // String (Maximum 500 characters)
     }
   ],
-
   "project": [
     {
-      "title": "",
-
-      "technologies": [],
-
-      "link": "",
-
-      "description": ""
+      "title": "", // String (Maximum 20 characters - abbreviate if needed)
+      "technologies": [], // Array of Strings
+      "link": "", // String (Valid URL or leave empty)
+      "description": "" // String (Maximum 500 characters)
     }
   ],
-
   "education": [
     {
-      "institution": "",
-
-      "degree": "",
-
-      "field_of_study": "",
-
-      "graduation_date": "",
-
-      "gpa": "",
-
-      "description": ""
+      "institution": "", // String (Maximum 100 characters)
+      "degree": "", // String (Maximum 100 characters)
+      "field_of_study": "", // String (Maximum 100 characters)
+      "graduation_date": "", // String (Maximum 10 characters)
+      "gpa": "", // String
+      "description": "" // String (Maximum 500 characters)
     }
   ]
-          } 
+}
           `,
         },
       ],
@@ -208,7 +182,7 @@ export const uploadResume = async (req, res) => {
     });
     res.status(200).json({ resume: newResume._id });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
     console.error("Professional Summary Enhance Error: ", err.message);
   }
 };

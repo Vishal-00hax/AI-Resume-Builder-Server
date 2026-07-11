@@ -158,16 +158,12 @@ export const getPublicResume = async (req, res) => {
   }
 };
 
-// Update Resume /api/resume/update
+// PATCH Update Resume /api/resume/update
 export const updateResume = async (req, res) => {
   try {
     const userId = req.user._id;
     const { resumeId, resumeData, removeBackground } = req.body;
     const image = req.file;
-
-    if (!resumeId || !mongoose.Types.ObjectId.isValid(resumeId)) {
-      return res.status(400).json({ error: "Valid Resume ID is required" });
-    }
 
     let parsedData = {};
     if (resumeData) {
@@ -218,7 +214,7 @@ export const updateResume = async (req, res) => {
     if (Object.keys(safeUpdatePayload).length === 0) {
       return res
         .status(400)
-        .json({ error: "No valid fields provided for update" });
+        .json({ message: "No valid fields provided for update" });
     }
 
     const resume = await Resume.findOneAndUpdate(
@@ -230,12 +226,12 @@ export const updateResume = async (req, res) => {
     if (!resume) {
       return res
         .status(404)
-        .json({ error: "Resume not found or unauthorized" });
+        .json({ message: "Resume not found or unauthorized" });
     }
 
     res.status(200).json({ success: true, resume: resume });
   } catch (err) {
     console.error("Update Resume Error:", err);
-    res.status(500).json({ error: "Internal server error: " + err.message });
+    res.status(500).json({ message: "Internal server error: " + err.message });
   }
 };

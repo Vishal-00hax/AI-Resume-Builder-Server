@@ -181,7 +181,7 @@ const ResumeSchema = new mongoose.Schema(
     professional_summary: {
       type: String,
       trim: true,
-      maxlength: 200,
+      maxlength: 500,
       default:
         "A brief summary of your professional background and career goals.",
     },
@@ -197,6 +197,7 @@ const ResumeSchema = new mongoose.Schema(
     personal_info: {
       type: PersonalInfoSchema,
       required: false,
+      default: {},
     },
     experience: {
       type: [ExperienceSchema],
