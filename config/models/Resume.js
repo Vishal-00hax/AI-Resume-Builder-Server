@@ -10,6 +10,10 @@ const PersonalInfoSchema = new mongoose.Schema({
       message: "Image must be a valid URL",
     },
   },
+  removeBackground: {
+    type: Boolean,
+    default: false,
+  },
   full_name: {
     type: String,
     default: "",

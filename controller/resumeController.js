@@ -177,6 +177,10 @@ export const updateResume = async (req, res) => {
       }
     }
 
+    const shouldRemoveBg =
+      removeBackground === "true" || removeBackground === true ? true : false;
+    parsedData["personal_info.removeBackground"] = shouldRemoveBg;
+
     if (image) {
       // Using diskStorage, image.buffer is undefined. It correctly falls back to createReadStream.
       const filePayload = image.buffer
@@ -189,10 +193,8 @@ export const updateResume = async (req, res) => {
         // IMPROVEMENT: Dynamically organize ImageKit folders by User ID!
         folder: `user-resumes/${userId}`,
         transformation: {
-          pre: `w-300,h-300,fo-face,z-0.75${
-            removeBackground === "true" || removeBackground === true
-              ? ",e-bgremove"
-              : ""
+          pre: `w-300,h-300,fo-face,z-0.75,f-png${
+            shouldRemoveBg ? ",e-bgremove" : ""
           }`,
         },
       });
