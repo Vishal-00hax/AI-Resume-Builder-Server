@@ -29,7 +29,6 @@ export const enhanceProfessionalSummary = async (req, res) => {
         },
       ],
       temperature: 0.6, // Keeps the output professional and focused, avoiding hallucinations
-      max_tokens: 1000, // Prevents the AI from rambling beyond 1-2 sentences
     });
     const enhanceResponse = response.choices[0].message.content.trim();
     res.status(200).json({ data: enhanceResponse });
@@ -83,7 +82,6 @@ export const enhanceJobDiscription = async (req, res) => {
         },
       ],
       temperature: 0.6, // Keeps the output professional and focused, avoiding hallucinations
-      max_tokens: 1000, // Prevents the AI from rambling beyond 1-2 sentences
     });
     const enhanceResponse = response.choices[0].message.content.trim();
     res.status(200).json({ data: enhanceResponse });
@@ -162,7 +160,6 @@ export const uploadResume = async (req, res) => {
         },
       ],
       temperature: 0.1, // Keeps the output professional and focused, avoiding hallucinations
-      max_tokens: 3000, // Prevents the AI from rambling beyond 1-2 sentences
       response_format: { type: "json_object" },
     });
     const enhanceResponse = response.choices[0].message.content.trim();
