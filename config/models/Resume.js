@@ -32,7 +32,7 @@ const PersonalInfoSchema = new mongoose.Schema({
       validator: (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
       message: "Email must be a valid email address",
     },
-    required: true,
+    default: "",
   },
   phone: {
     type: String,
