@@ -16,6 +16,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4000",
   "https://vishaldevtribe.com",
+  "https://ai-resume-builder.vishaldevtribe.com", // इसे सीधे यहाँ भी डाल दें ताकि तुरंत काम करे
   process.env.FRONTEND_URL,
 ];
 
@@ -23,22 +24,21 @@ app.use(express.json());
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (जैसे Postman या mobile apps या server-to-server requests)
+      // Allow requests with no origin (जैसे Postman या server-to-server)
       if (!origin) return callback(null, true);
 
-      if (
-        allowedOrigins.indexOf(origin) !== -1 ||
-        !process.env.NODE_ENV ||
-        process.env.NODE_ENV === "development"
-      ) {
+      // check if origin is in allowedOrigins
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         console.log("Blocked by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true, // अगर आप Cookies या Authorization Headers (JWT Token) भेज रहे हैं तो यह बहुत ज़रूरी है
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // यह हेडर जोड़ना ज़रूरी है
+    optionsSuccessStatus: 200, // कुछ पुराने ब्राउज़र्स 204 की जगह 200 मांगते हैं
   }),
 );
 
